@@ -1,15 +1,15 @@
-NVCC = $(shell which nvcc)
-NVCC_FLAGS = -g -G -Xcompiler -Wall
+NVCC = $(shell which gcc)
+NVCC_FLAGS = -O3 -g -Wall
 
 all: main.exe
 
 main.exe: main.o kernel.o
 	$(NVCC) $^ -o $@
 
-main.o: main.cpp kernel.h
+main.o: main.c kernel.h
 	$(NVCC) $(NVCC_FLAGS) -c $< -o $@
 
-kernel.o: kernel.cu kernel.h
+kernel.o: kernel.c kernel.h
 	$(NVCC) $(NVCC_FLAGS) -c $< -o $@
 
 clean:
