@@ -7,13 +7,13 @@ int main() {
   const int N = 150;
   const float h = 2 * PI / N;
   
-  float x[N] = { 0.0 };
-  float u[N] = { 0.0 };
-  float result_parallel[N] = { 0.0 };
+  float x[N];
+  float u[N];
+  float result_parallel[N];
 
   for (int i = 0; i < N; ++i) {
     x[i] = 2 * PI*i / N;
-    u[i] = sinf(x[i]);
+    u[i] = sin(x[i]);
   }
 
   ddParallel(result_parallel, u, N, h);
