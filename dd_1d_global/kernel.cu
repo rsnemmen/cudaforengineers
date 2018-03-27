@@ -1,5 +1,5 @@
 #include "kernel.h"
-#define TPB 64
+#define TPB 512
 
 __global__
 void ddKernel(float *d_out, const float *d_in, int size, float h) {

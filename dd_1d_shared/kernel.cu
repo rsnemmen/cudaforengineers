@@ -1,5 +1,5 @@
 #include "kernel.h"
-#define TPB 64
+#define TPB 256
 #define RAD 1 // radius of the stencil
 
 __global__
