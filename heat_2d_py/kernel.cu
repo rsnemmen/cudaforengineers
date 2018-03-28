@@ -1,6 +1,6 @@
 #include "kernel.h"
-#define TX 32
-#define TY 32
+#define TX 64
+#define TY 64
 #define RAD 1
 
 // divUp() is for computing the number of blocks of a specified size to cover a 
