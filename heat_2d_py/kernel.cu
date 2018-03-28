@@ -7,13 +7,8 @@
 // computational grid. 
 int divUp(int a, int b) { return (a + b - 1) / b; }
 
-// clip() is used to ensure that color values are of type unsigned char and in the 
-// correct range [0, 255]. 
-__device__
-unsigned char clip(int n) { return n > 255 ? 255 : (n < 0 ? 0 : n); }
-
 // idxClip() keeps from sampling out of bounds. idxClip(i, N) returns an int in 
-the interval [0, N − 1] (i.e., the set of legal indices for an array of length N). 
+// the interval [0, N − 1] (i.e., the set of legal indices for an array of length N). 
 __device__
 int idxClip(int idx, int idxMax) {
   return idx >(idxMax - 1) ? (idxMax - 1) : (idx < 0 ? 0 : idx);
@@ -58,7 +53,7 @@ having a strong blue component and hot regions having a strong red component. Th
 kernel functions are called
 */
 __global__
-void tempKernel(uchar4 *d_out, float *d_temp, int w, int h, BC bc) {
+void tempKernel(float *d_temp, int w, int h, BC bc) {
   extern __shared__ float s_in[];
   // global indices
   const int col = threadIdx.x + blockDim.x * blockIdx.x;
@@ -72,14 +67,10 @@ void tempKernel(uchar4 *d_out, float *d_temp, int w, int h, BC bc) {
   const int s_col = threadIdx.x + RAD;
   const int s_row = threadIdx.y + RAD;
   const int s_idx = flatten(s_col, s_row, s_w, s_h);
-  // assign default color values for d_out (black)
-  d_out[idx].x = 0;
-  d_out[idx].z = 0;
-  d_out[idx].y = 0;
-  d_out[idx].w = 255;
   
   // Load regular cells
   s_in[s_idx] = d_temp[idx];
+
   // Load halo cells
   if (threadIdx.x < RAD) {
     s_in[flatten(s_col - RAD, s_row, s_w, s_h)] =
@@ -113,24 +104,29 @@ void tempKernel(uchar4 *d_out, float *d_temp, int w, int h, BC bc) {
     return;
   }
   __syncthreads();
+
   // For all the remaining points, find temperature and set colors.
   float temp = 0.25f*(s_in[flatten(s_col - 1, s_row, s_w, s_h)] +
   s_in[flatten(s_col + 1, s_row, s_w, s_h)] +
   s_in[flatten(s_col, s_row - 1, s_w, s_h)] +
   s_in[flatten(s_col, s_row + 1, s_w, s_h)]);
   d_temp[idx] = temp;
-  const unsigned char intensity = clip((int)temp);
-  d_out[idx].x = intensity; // higher temp -> more red
-  d_out[idx].z = 255 - intensity; // lower temp -> more blue
 }
 
-void kernelLauncher(uchar4 *d_out, float *d_temp, int w, int h,
-                    BC bc) {
+
+
+
+
+void kernelLauncher(float *d_temp, int w, int h, BC bc) {
   const dim3 blockSize(TX, TY);
   const dim3 gridSize(divUp(w, TX), divUp(h, TY));
   const size_t smSz = (TX + 2 * RAD)*(TY + 2 * RAD)*sizeof(float);
-  tempKernel<<<gridSize, blockSize, smSz>>>(d_out, d_temp, w, h, bc);
+  tempKernel<<<gridSize, blockSize, smSz>>>(d_temp, w, h, bc);
 }
+
+
+
+
 
 void resetTemperature(float *d_temp, int w, int h, BC bc) {
   const dim3 blockSize(TX, TY);

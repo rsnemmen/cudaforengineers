@@ -13,7 +13,7 @@ __device__
 unsigned char clip(int n) { return n > 255 ? 255 : (n < 0 ? 0 : n); }
 
 // idxClip() keeps from sampling out of bounds. idxClip(i, N) returns an int in 
-the interval [0, N − 1] (i.e., the set of legal indices for an array of length N). 
+// the interval [0, N − 1] (i.e., the set of legal indices for an array of length N). 
 __device__
 int idxClip(int idx, int idxMax) {
   return idx >(idxMax - 1) ? (idxMax - 1) : (idx < 0 ? 0 : idx);
