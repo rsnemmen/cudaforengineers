@@ -15,21 +15,21 @@ BC bc = {W / 2, H / 2, W / 10.f, 150, 212.f, 70.f, 0.f}; // Boundary conditions
 
 
 // renders images with temperature distribution
-void render(float *temp, int W, int H, BC bc) {
+void render(float *temp, int w, int h, BC bc) {
   // prints simulation parameters
-  char title[128];
-  sprintf(title, "Temperatures: T_s=%3.0f, T_a=%3.0f, T_g=%3.0f",
+  //char title[128];
+  printf("Temperatures: T_s=%3.0f, T_a=%3.0f, T_g=%3.0f",
                   bc.t_s, bc.t_a, bc.t_g);
-  printf(title);
+  //printf(title);
 
   // open file for writing
-  FILE *f = fopen(argv[3], "w");
+  FILE *f = fopen("output.dat", "w");
   if (f == NULL) {
       printf("Error opening file!\n");
       exit(1);
   }
 
-  for (int i=0; i<W*H-1; i++) {
+  for (int i=0; i<w*h-1; i++) {
       fprintf(f, "%f\n", temp[i]);
   }
 
@@ -49,10 +49,10 @@ int main(int argc, char** argv) {
     kernelLauncher(d_temp, W, H, bc); // calls kernel that solves PDE
   }
 
+  float *temp = (float *)calloc(W*H, sizeof(float));
   cudaMemcpy(temp, d_temp, W*H*sizeof(float), cudaMemcpyDeviceToHost);  
 
-  float *temp = (float *)calloc(W*H, sizeof(float));
-  render(temp,W,H,bc)
+  render(temp,W,H,bc);
 
   cudaFree(d_temp);
   free(temp);
