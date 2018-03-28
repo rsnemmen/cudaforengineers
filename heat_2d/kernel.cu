@@ -3,21 +3,38 @@
 #define TY 32
 #define RAD 1
 
+// divUp() is for computing the number of blocks of a specified size to cover a 
+// computational grid. 
 int divUp(int a, int b) { return (a + b - 1) / b; }
 
+// clip() is used to ensure that color values are of type unsigned char and in the 
+// correct range [0, 255]. 
 __device__
 unsigned char clip(int n) { return n > 255 ? 255 : (n < 0 ? 0 : n); }
 
+// idxClip() keeps from sampling out of bounds. idxClip(i, N) returns an int in 
+the interval [0, N − 1] (i.e., the set of legal indices for an array of length N). 
 __device__
 int idxClip(int idx, int idxMax) {
   return idx >(idxMax - 1) ? (idxMax - 1) : (idx < 0 ? 0 : idx);
 }
 
+// flatten() computes the index in a flattened 1D array corresponding to the entry 
+// at col and row in a 2D array (or image) of width and height. Note that flatten() 
+// uses idxClip() to prevent from trying to access nonexistent array entries when 
+// the stencil extends beyond the edge of the grid. 
 __device__
 int flatten(int col, int row, int width, int height) {
   return idxClip(col, width) + idxClip(row, height)*width;
 }
 
+/*
+It starts by using the 
+built-in CUDA index and dimension variables to compute the indices col and row for 
+each point on the 2D geometric grid. If the pixel lies within the bounds of the 
+graphics window, the flattened index idx is computed, and a default value 
+(chosen to be the air temperature) is saved at each point on the grid. 
+*/
 __global__
 void resetKernel(float *d_temp, int w, int h, BC bc) {
   const int col = blockIdx.x*blockDim.x + threadIdx.x;
@@ -26,6 +43,20 @@ void resetKernel(float *d_temp, int w, int h, BC bc) {
   d_temp[row*w + col] = bc.t_a;
 }
 
+/*
+tempKernel() first assigns the default color black (with full opacity) to all pixels, 
+then loads a tile (including the necessary halo) of existing temperature values 
+into shared memory. 
+• For points outside the domain of the plate, the kernel reapplies the specified 
+boundary values. 
+• For the points inside the problem domain, the kernel performs one step of Jacobi 
+iteration by applying the stencil computation to compute the updated temperature 
+value and writes the solution to the corresponding location in the global memory array. 
+• Finally, the updated temperature values are clipped to the interval [0, 255], 
+converted to unsigned char values, and coded into color values with cold regions 
+having a strong blue component and hot regions having a strong red component. The 
+kernel functions are called
+*/
 __global__
 void tempKernel(uchar4 *d_out, float *d_temp, int w, int h, BC bc) {
   extern __shared__ float s_in[];

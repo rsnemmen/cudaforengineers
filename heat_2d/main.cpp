@@ -90,14 +90,14 @@ void exitfunc() {
 
 int main(int argc, char** argv) {
   cudaMalloc(&d_temp, W*H*sizeof(float));
-  resetTemperature(d_temp, W, H, bc);
+  resetTemperature(d_temp, W, H, bc); // calls first kernel
   printInstructions();
   initGLUT(&argc, argv);
   gluOrtho2D(0, W, H, 0);
   glutKeyboardFunc(keyboard);
   glutMouseFunc(mouse);
   glutIdleFunc(idle);
-  glutDisplayFunc(display);
+  glutDisplayFunc(display); // PDE solving called here, computational bottleneck
   initPixelBuffer();
   glutMainLoop();
   atexit(exitfunc);
