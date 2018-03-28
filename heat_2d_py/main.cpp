@@ -1,42 +1,61 @@
-#include "interactions.h"
 #include "kernel.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 #define ITERS_PER_RENDER 50 // number of iterations per render
-#define NRENDERS 100 // number of images produced
 #define W 640 // size of temperature array
 #define H 640
 
 float *d_temp = 0;
-int iterationCount = 0;
-BC bc = {W / 2, H / 2, W / 10.f, 150, 212.f, 70.f, 0.f}; // Boundary conds
+//int iterationCount = 0;
+BC bc = {W / 2, H / 2, W / 10.f, 150, 212.f, 70.f, 0.f}; // Boundary conditions
+
+
+
+
 
 // renders images with temperature distribution
-void render(d_temp,W,H,bc) {
+void render(temp,W,H,bc) {
   // prints simulation parameters
   char title[128];
-  sprintf(title, "Temperature Visualizer - Iterations=%4d, "
-                  "T_s=%3.0f, T_a=%3.0f, T_g=%3.0f",
-                  iterationCount, bc.t_s, bc.t_a, bc.t_g);
+  sprintf(title, "Temperatures: T_s=%3.0f, T_a=%3.0f, T_g=%3.0f",
+                  bc.t_s, bc.t_a, bc.t_g);
   printf(title);
 
-  CODE FOR PRODUCING ARRAY
+  // open file for writing
+  FILE *f = fopen(argv[3], "w");
+  if (f == NULL) {
+      printf("Error opening file!\n");
+      exit(1);
+  }
+
+  for (int i=0; i<W*H-1; i++) {
+      fprintf(f, "%f\n", temp[i]);
+  }
+
+  fclose(f);
 }
+
+
+
+
 
 
 int main(int argc, char** argv) {
   cudaMalloc(&d_temp, W*H*sizeof(float));
-
   resetTemperature(d_temp, W, H, bc); // calls first kernel
 
   for (int i = 0; i < ITERS_PER_RENDER; ++i) {
-    kernelLauncher(d_temp, W, H, bc);
+    kernelLauncher(d_temp, W, H, bc); // calls kernel that solves PDE
   }
 
-  render(d_temp,W,H,bc)
+  cudaMemcpy(temp, d_temp, W*H*sizeof(float), cudaMemcpyDeviceToHost);  
+
+  float *temp = (float *)calloc(W*H, sizeof(float));
+  render(temp,W,H,bc)
 
   cudaFree(d_temp);
+  free(temp);
 
   return 0;
 }

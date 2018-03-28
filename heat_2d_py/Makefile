@@ -16,7 +16,7 @@ all: main.exe
 main.exe: main.o kernel.o
 	$(NVCC) $^ -o $@ $(LDFLAGS)
 
-main.o: main.cpp kernel.h interactions.h
+main.o: main.cpp kernel.h 
 	$(NVCC) $(NVCC_FLAGS) $(INC) -c $< -o $@
 
 kernel.o: kernel.cu kernel.h

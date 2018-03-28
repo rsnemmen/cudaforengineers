@@ -94,6 +94,8 @@ void tempKernel(uchar4 *d_out, float *d_temp, int w, int h, BC bc) {
       d_temp[flatten(col, row + blockDim.y, w, h)];
   }
 
+  // Sets boundary conditions
+  //
   // Calculate squared distance from pipe center
   float dSq = ((col - bc.x)*(col - bc.x) + (row - bc.y)*(row - bc.y));
   // If inside pipe, set temp to t_s and return
