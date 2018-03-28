@@ -3,11 +3,16 @@
 #include <stdlib.h>
 #include <cuda_runtime.h>
 #include <cuda_gl_interop.h>
-#define ITERS_PER_RENDER 500 // number of iterations per render
+#define ITERS_PER_RENDER 1000 // number of iterations per render
 #define W 640 // size of temperature array
 #define H 640
 
-BC bc = {W / 2, H / 2, W / 10.f, 150, 212.f, 51.f, 227.f}; // Boundary conditions
+// Boundary conditions
+// • x and y location of pipe center
+// • radius of pipe
+// • chamfer
+// • temperatures in pipe, air, ground
+BC bc = {W / 2, H / 2, W / 4.f, 150, 212.f, 51.f, 100.f}; 
 
 
 
