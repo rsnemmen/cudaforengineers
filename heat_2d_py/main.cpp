@@ -15,7 +15,7 @@ BC bc = {W / 2, H / 2, W / 10.f, 150, 212.f, 70.f, 0.f}; // Boundary conditions
 
 
 // renders images with temperature distribution
-void render(temp,W,H,bc) {
+void render(float *temp, int W, int H, BC bc) {
   // prints simulation parameters
   char title[128];
   sprintf(title, "Temperatures: T_s=%3.0f, T_a=%3.0f, T_g=%3.0f",
