@@ -3,11 +3,11 @@
 #include <stdlib.h>
 #include <cuda_runtime.h>
 #include <cuda_gl_interop.h>
-#define ITERS_PER_RENDER 50 // number of iterations per render
+#define ITERS_PER_RENDER 500 // number of iterations per render
 #define W 640 // size of temperature array
 #define H 640
 
-BC bc = {W / 2, H / 2, W / 10.f, 150, 212.f, 70.f, 0.f}; // Boundary conditions
+BC bc = {W / 2, H / 2, W / 10.f, 150, 212.f, 51.f, 227.f}; // Boundary conditions
 
 
 
@@ -17,7 +17,7 @@ BC bc = {W / 2, H / 2, W / 10.f, 150, 212.f, 70.f, 0.f}; // Boundary conditions
 void render(float *temp, int w, int h, BC bc) {
   // prints simulation parameters
   //char title[128];
-  printf("Temperatures: T_s=%3.0f, T_a=%3.0f, T_g=%3.0f",
+  printf("Temperatures: T_s=%3.0f, T_a=%3.0f, T_g=%3.0f \n",
                   bc.t_s, bc.t_a, bc.t_g);
   //printf(title);
 
@@ -28,8 +28,8 @@ void render(float *temp, int w, int h, BC bc) {
       exit(1);
   }
 
-  for (int i=0; i<w*h-1; i++) {
-      fprintf(f, "%f\n", temp[i]);
+  for (int i=0; i<w*h; i++) {
+      fprintf(f, "%f ", temp[i]);
   }
 
   fclose(f);
