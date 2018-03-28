@@ -15,12 +15,16 @@ void ddKernel(float *d_out, const float *d_in, int size, float h) {
 
   // Halo cells
   if (threadIdx.x < RAD) {
-    s_in[s_idx - RAD] = d_in[i - RAD];
-    s_in[s_idx + blockDim.x] = d_in[i + blockDim.x];
+    s_in[s_idx - RAD] = d_in[i - RAD]; // careful: this will access also d_in[-1] which is undefined!
+    s_in[s_idx + blockDim.x] = d_in[i + blockDim.x]; // careful: this will access d_in[size+1] which is undefined!
   }
   __syncthreads();
   d_out[i] = (s_in[s_idx-1] - 2.f*s_in[s_idx] + s_in[s_idx+1])/(h*h);
 }
+
+
+
+
 
 void ddParallel(float *out, const float *in, int n, float h) {
   float *d_in = 0, *d_out = 0;
