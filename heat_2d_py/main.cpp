@@ -1,13 +1,12 @@
 #include "kernel.h"
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <cuda_runtime.h>
+#include <cuda_gl_interop.h>
 #define ITERS_PER_RENDER 50 // number of iterations per render
 #define W 640 // size of temperature array
 #define H 640
 
-float *d_temp = 0;
-//int iterationCount = 0;
 BC bc = {W / 2, H / 2, W / 10.f, 150, 212.f, 70.f, 0.f}; // Boundary conditions
 
 
@@ -42,6 +41,8 @@ void render(float *temp, int w, int h, BC bc) {
 
 
 int main(int argc, char** argv) {
+  float *d_temp = 0;
+
   cudaMalloc(&d_temp, W*H*sizeof(float));
   resetTemperature(d_temp, W, H, bc); // calls first kernel
 

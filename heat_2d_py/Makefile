@@ -1,10 +1,11 @@
 NVCC = $(shell which nvcc)
 NVCC_FLAGS = -g -G -Xcompiler -Wall -Wno-deprecated-declarations
+INC = -I/usr/local/cuda/samples/common/inc
 
 all: main.exe
 
 main.exe: main.o kernel.o
-	$(NVCC) $^ -o $@ $(LDFLAGS)
+	$(NVCC) $^ -o $@ 
 
 main.o: main.cpp kernel.h 
 	$(NVCC) $(NVCC_FLAGS) $(INC) -c $< -o $@
