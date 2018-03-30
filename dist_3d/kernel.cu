@@ -5,6 +5,8 @@
 #define TY 8 // number of threads per block along y-axis
 #define TZ 8 // number of threads per block along z-axis
 
+// divUp() is for computing the number of blocks of a specified size to cover a 
+// computational grid. 
 int divUp(int a, int b) { return (a + b - 1) / b; }
 
 __device__
