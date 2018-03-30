@@ -13,7 +13,8 @@ void dotKernel(int *d_res, const int *d_a, const int *d_b, int n) {
   s_prod[s_idx] = d_a[idx] * d_b[idx];
   __syncthreads();
 
-  if (s_idx == 0) {
+  // only first thread in each block performs the sum
+  if (s_idx == 0) { 
     int blockSum = 0;
     for (int j = 0; j < blockDim.x; ++j) {
       blockSum += s_prod[j];
@@ -23,7 +24,7 @@ void dotKernel(int *d_res, const int *d_a, const int *d_b, int n) {
     if (ATOMIC) {
       atomicAdd(d_res, blockSum);
     } else {
-      *d_res += blockSum;
+      *d_res += blockSum; // regular addition
     }
   }
 }
