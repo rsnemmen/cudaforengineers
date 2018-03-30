@@ -11,7 +11,7 @@ typedef struct {
 
 //__device__
 float distance(int c, int r, int s, loc3d pos) {
-  return sqrtf((c - pos.x)*(c - pos.x) + (r - pos.y)*(r - pos.y) +
+  return sqrt((c - pos.x)*(c - pos.x) + (r - pos.y)*(r - pos.y) +
                (s - pos.z)*(s - pos.z));
 }
 
