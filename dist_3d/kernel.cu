@@ -1,9 +1,9 @@
-#define W 32
-#define H 32
-#define D 32
+#define W 320
+#define H 320
+#define D 3200
 #define TX 8 // number of threads per block along x-axis
 #define TY 8 // number of threads per block along y-axis
-#define TZ 8 // number of threads per block along z-axis
+#define TZ 16 // number of threads per block along z-axis
 
 int divUp(int a, int b) { return (a + b - 1) / b; }
 
